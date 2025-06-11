@@ -2,7 +2,12 @@
 
 Protify is a Python package for estimating stellar rotation periods from TESS light curves. It combines Lomb-Scargle periodogram analysis, custom light curve metrics, and a trained machine learning classifier to identify likely rotators.
 
-The classifier is trained on benchmark gyrochronology open cluster stars and selected field stars from [Rampalli et al. (2023)](#citation), achieving a cross-validation accuracy of approximately 80%. This package was developed with the help of open-AI. Original code written by Rayna Rampalli. 
+The classifier is trained on benchmark gyrochronology open cluster stars and selected field stars from [Rampalli et al. (2023)](#citation), achieving a cross-validation accuracy of approximately 80%.
+
+> If you use Protify in your work, **please cite [Rampalli et al. (2023)](#citation).**
+
+This package was developed with the help of OpenAI. Original code written by Rayna Rampalli.
+
 
 ---
 
@@ -36,7 +41,7 @@ Other fields like `RA`, `Dec`, or provenance flags can be included but are not r
 
 ---
 
-## Quickstart
+## Installation & Quickstart
 
 ```bash
 cd protify
@@ -55,6 +60,13 @@ protify summarize --raw rotation_raw.csv --summary rotation_summary.csv
 # Step 3: Classify rotators using the trained model
 protify classify --raw rotation_raw.csv --summary rotation_summary.csv --train protify/data/RotatorTrainingSet.csv
 ```
+
+---
+## ⚠️ Caveats
+
+- **By-eye validation is recommended**. TESS systematics and short baselines increase false positive rates compared to Kepler/K2.
+- This package is not optimized for speed. Expect ~5–15 seconds per sector on a 2020 MacBook Pro with all options enabled.
+- `examples/sample_input.csv` contains known rotators from the training set and is only for demonstration.
 
 ---
 
@@ -134,13 +146,7 @@ The `examples/` directory includes:
 
 ---
 
-## ⚠️ Caveats
 
-- **By-eye validation is recommended**. TESS systematics and short baselines increase false positive rates compared to Kepler/K2.
-- This package is not optimized for speed. Expect ~5–15 seconds per sector on a 2020 MacBook Pro with all options enabled.
-- `examples/sample_input.csv` contains known rotators from the training set and is only for demonstration.
-
----
 
 ## Data Sources
 
@@ -167,8 +173,8 @@ ApJ, 958, 76.
 @ARTICLE{2023ApJ...958...76R,
        author = {{Rampalli}, Rayna and {Smock}, Amy and {Newton}, Elisabeth R. and {Daniel}, Kathryne J. and {Curtis}, Jason L.},
         title = "{Wrinkles in Time. I. Rapid Rotators Found in High-eccentricity Orbits}",
-      journal = {pj},
-     keywords = {Stellar rotation, Milky Way dynamics, Stellar kinematics, Stellar ages, 1629, 1051, 1608, 1581},
+      journal = {\apj},
+     keywords = {Stellar rotation, Milky Way dynamics, Stellar kinematics, Stellar ages, 1629, 1051, 1608, 1581, Astrophysics - Solar and Stellar Astrophysics, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Astrophysics of Galaxies},
          year = 2023,
         month = nov,
        volume = {958},
@@ -176,9 +182,14 @@ ApJ, 958, 76.
           eid = {76},
         pages = {76},
           doi = {10.3847/1538-4357/acff69},
+archivePrefix = {arXiv},
        eprint = {2310.02305},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2023ApJ...958...76R}
+ primaryClass = {astro-ph.SR},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2023ApJ...958...76R},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+
+
 ```
 
 ---
