@@ -2,7 +2,7 @@
 
 Protify is a Python package for estimating stellar rotation periods from TESS light curves. It combines Lomb-Scargle periodogram analysis, custom light curve metrics, and a trained machine learning classifier to identify likely rotators.
 
-The classifier is trained on benchmark gyrochronology open cluster stars and selected field stars from [Rampalli et al. (2023)](#citation), achieving a cross-validation accuracy of approximately 80%.
+The classifier is trained on benchmark gyrochronology open cluster stars and selected field stars from [Rampalli et al. (2023)](#citation), achieving a cross-validation accuracy of approximately 80%. This package was developed with the help of open-AI. Original code written by Rayna Rampalli. 
 
 ---
 
@@ -182,7 +182,3 @@ ApJ, 958, 76.
 ```
 
 ---
-
-## 🪪 License
-
-MIT License (or fill in your preferred license).
