@@ -1,0 +1,32 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Editable install metadata
+*.egg-info/
+
+# Jupyter
+*.ipynb_checkpoints/
+
+# OS metadata
+.DS_Store
+
+# Project output
+lightcurves/*
+!lightcurves/.gitkeep
+
+plots/*
+!plots/.gitkeep
+
+failures.csv
+rotation_raw.csv
+rotation_summary.csv
+rotation_classified.csv
+
+# Build & packaging
+build/
+dist/
+.eggs/
