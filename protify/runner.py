@@ -20,6 +20,7 @@ def run_period_pipeline(
 
     if os.path.exists(raw_output_csv):
         existing_df = pd.read_csv(raw_output_csv)
+        existing_df['TIC'] = existing_df['TIC'].astype('int')
         done_ids = set(existing_df['TIC'].astype(str))
         print(f"Resuming: {len(done_ids)} stars already processed.")
     else:
