@@ -73,28 +73,71 @@ def unc_fit(freq, pgramy, prot):
     except Exception:
         return np.nan, np.nan, np.nan
 
+def get_unmasked_array(q):
+    if isinstance(q, Masked):
+        return q.unmasked.value.astype(np.float64)
+    else:
+        return q.value.astype(np.float64)
+
 def compute_rotation_metrics(lightcurves, sectors, tic_id):
+    print(f"Starting TIC {tic_id} with {len(lightcurves)} lightcurves")
+    
     results = {}
     pgramx_list, pgramy_list, times, fluxes = [], [], [], []
 
     for i, lc in enumerate(lightcurves):
-        time = lc.time.value
-        flux = lc.flux.value
-        flux_err = lc.flux_err.value if hasattr(lc, 'flux_err') else np.ones_like(flux)
-
-        mask = np.isfinite(time) & np.isfinite(flux)
-        time, flux, flux_err = time[mask], flux[mask], flux_err[mask]
-        if len(time) < 10:
-            continue
+        print(f"\n--- Sector {i} ---")
 
         try:
+            time = lc.time.value
+            print(f"  Time array loaded: len={len(time)}")
+
+            flux = get_unmasked_array(lc.flux)
+            print(f"  Flux array loaded")
+
+            if hasattr(lc, 'flux_err'):
+                flux_err = get_unmasked_array(lc.flux_err)
+                print(f"  Flux error loaded from lc")
+            else:
+                flux_err = np.ones_like(flux)
+                print(f"  Flux error defaulted to ones")
+
+            mask = np.isfinite(time) & np.isfinite(flux)
+            time, flux, flux_err = time[mask], flux[mask], flux_err[mask]
+            print(f"  After masking: len(time) = {len(time)}")
+
+            if len(time) < 10:
+                print(f"  Skipping sector {i}: not enough data points")
+                continue
+
+            print(f"  Running GLS...")
             freq, pgramx, pgramy, prot, peaks2, ifmax, power, medp, peakflag = GLS(time, flux, flux_err)
+            print(f"  GLS complete. Period = {prot:.2f}")
+
+            print(f"  Running unc_fit...")
             _, _, unc = unc_fit(freq, pgramy, prot)
-        except Exception:
+            print(f"  unc_fit complete. Unc = {unc:.2f}")
+
+        except Exception as e:
+            print(f"  ERROR in sector {i} for TIC {tic_id}: {e}")
             prot, unc, power, medp, peakflag = np.nan, np.nan, np.nan, np.nan, np.nan
+            freq, pgramx, pgramy = None, None, None
+
+        # Get safe sector label
+        if sectors is None:
+            print(f"  ERROR: sectors is None!")
+            sector_val = f"UNKNOWN_{i}"
+        elif i >= len(sectors):
+            print(f"  ERROR: sector index {i} out of bounds for sectors of length {len(sectors)}")
+            sector_val = f"UNKNOWN_{i}"
+        elif sectors[i] is None:
+            print(f"  WARNING: sectors[{i}] is None")
+            sector_val = f"UNKNOWN_{i}"
+        else:
+            sector_val = str(sectors[i])
 
         results[str(i)] = {
-            'sector': str(sectors[i]),
+            'sector': sector_val,
             'prot': prot,
             'uncsec': unc,
             'power': power,
@@ -104,11 +147,16 @@ def compute_rotation_metrics(lightcurves, sectors, tic_id):
 
         times.append(time)
         fluxes.append(flux)
-        pgramx_list.append(pgramx)
-        pgramy_list.append(pgramy)
+        if pgramx is not None and pgramy is not None:
+            pgramx_list.append(pgramx)
+            pgramy_list.append(pgramy)
+
+        print(f"  Sector {i} finished.")
+
+    print("All sectors processed. Finalizing...")
 
     flat_result = {f"{i}_{k}": v for i, res in results.items() for k, v in res.items()}
-    flat_result['TIC'] = tic_id  # top-level key used by runner.py
+    flat_result['TIC'] = tic_id
 
     return {
         'TIC': tic_id,
