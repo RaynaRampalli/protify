@@ -149,7 +149,7 @@ If you are not using the full pipeline (`protify run` and `protify summarize`), 
 | `snr`     | Average signal-to-noise ratio across sectors — defined as `peak power / median power` |
 | `mpower`  | Average of median periodogram power across all sectors                      |
 
-> **Note:** The definitions of `snr` and `mpower` may vary depending on the periodogram method used. For compatibility with the trained model, we recommend generating them using `protify run` followed by `protify summarize`.
+> **Note:** The values of `snr` and `mpower` may vary depending on the periodogram method + software used. For compatibility with the trained model, we recommend generating them using `protify run` followed by `protify summarize`.
 
 
 ---
