@@ -17,27 +17,29 @@ def run_period_pipeline(
     failure_log="failures.csv"
 ):
     df = pd.read_csv(input_csv)
+    total = len(df)
 
     if os.path.exists(raw_output_csv):
         existing_df = pd.read_csv(raw_output_csv)
-        #existing_df['TIC'] = existing_df['TIC'].astype('int')
         done_ids = set(existing_df['TIC'].astype(str))
+        existing_cols = list(existing_df.columns)
         print(f"Resuming: {len(done_ids)} stars already processed.")
     else:
-        existing_df = pd.DataFrame()
         done_ids = set()
+        existing_df = pd.DataFrame()
+        existing_cols = []
 
     failed = []
-    updated_rows = []
 
     for index, row in df.iterrows():
         star_id = str(int(row.get('TIC')) or int(row.get('ID')))
         if pd.isnull(star_id) or star_id in done_ids:
             continue
 
+        print(f"\n🔄 Processing {index + 1}/{total}: TIC {star_id}")
+
         try:
             start = time.time()
-            print(f"Starting TIC {star_id}...")
 
             lcs, sectors = download_tess_lightcurves(star_id)
             print(f"  Found {len(sectors)} sectors.")
@@ -48,20 +50,42 @@ def run_period_pipeline(
                 with open(os.path.join(pickle_dir, f"TIC{star_id}.pkl"), "wb") as f:
                     pickle.dump(metrics, f)
 
-            # Always keep full set of sector columns (even if invalid)
+            # Flatten sector-wise results
             flat_results = {}
             for i in sorted(metrics['Results'].keys(), key=int):
                 sector_data = metrics['Results'][i]
                 for key in ['sector', 'prot', 'uncsec', 'power', 'medpower', 'peakflag']:
                     colname = f"{i}_{key}"
-                    val = sector_data.get(key, None)
-                    flat_results[colname] = val
+                    flat_results[colname] = sector_data.get(key, None)
 
             result_row = {col: row[col] for col in row.index}
             result_row['TIC'] = star_id
             result_row.update(flat_results)
 
-            updated_rows.append(result_row)
+            # --- Sync columns and autosort ---
+            for col in existing_cols:
+                result_row.setdefault(col, None)
+            for col in result_row.keys():
+                if col not in existing_cols:
+                    existing_cols.append(col)
+
+            base_cols = ['TIC', 'ID', 'gmag']
+            sector_cols = sorted(
+                [col for col in existing_cols if col not in base_cols],
+                key=lambda c: (int(c.split('_')[0]) if c[0].isdigit() else 9999, c)
+            )
+            sorted_cols = base_cols + [col for col in sector_cols if col not in base_cols]
+
+            result_df = pd.DataFrame([result_row], columns=sorted_cols)
+            existing_cols = sorted_cols  # keep updating column order
+
+            # --- Write file ---
+            if os.path.exists(raw_output_csv):
+                result_df.to_csv(raw_output_csv, mode='a', header=False, index=False)
+            else:
+                result_df.to_csv(raw_output_csv, mode='w', header=True, index=False)
+
+            print(f"  ✅ Saved TIC {star_id} to {raw_output_csv}")
 
             duration = round(time.time() - start, 2)
             if len(sectors) > 0:
@@ -73,18 +97,6 @@ def run_period_pipeline(
             print(f"❌ Failed on TIC {star_id}: {e}")
             failed.append({"TIC": star_id, "error": str(e)})
             pd.DataFrame(failed).to_csv(failure_log, index=False)
-
-    # Combine old and new results, expanding all columns
-    if updated_rows:
-        new_df = pd.DataFrame(updated_rows)
-
-        if not existing_df.empty:
-            combined_df = pd.concat([existing_df, new_df], ignore_index=True, sort=False)
-        else:
-            combined_df = new_df
-
-        combined_df.to_csv(raw_output_csv, index=False)
-        print(f"\n✅ Saved all results to {raw_output_csv} with updated columns.")
 
     if save_lc_pickle and save_plots:
         batch_plot_lightcurves(pickle_dir=pickle_dir, save_dir=plot_dir)
