@@ -45,6 +45,7 @@ Other fields like `RA`, `Dec`, or provenance flags can be included but are not r
 ## Installation & Quickstart
 
 ```bash
+git clone https://github.com/RaynaRampalli/protify.git
 cd protify
 pip install -e .
 ```
