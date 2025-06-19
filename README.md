@@ -6,7 +6,7 @@ The classifier is trained on benchmark gyrochronology open cluster stars and sel
 
 > If you use Protify in your work, **please cite [Rampalli et al. (2023)](#citation).**
 
-This package was developed with the help of OpenAI. Original code written by Rayna Rampalli.
+Original code written by Rayna Rampalli. This package was developed with the help of OpenAI tools to support coding and documentation.
 
 
 ---
