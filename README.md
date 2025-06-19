@@ -112,7 +112,7 @@ protify summarize \
 
 ---
 
-###  `protify classify`
+### `protify classify`
 
 Applies a trained classifier to flag likely rotators.
 
@@ -130,7 +130,25 @@ protify classify \
 - `--summary`: Summary metrics CSV (**required**, can reuse from above)
 - `--train`: Training set CSV (**required**)
 - `--output`: Output file for classification results (default: `rotation_classified.csv`)
-- `--no-autoval`: Include all stars, not just auto-validated ones
+- `--no-autoval`: Include all stars, not just auto-validated ones as determined in  `protify summarize` (e.g., stars with significant rotation signals and matching periods for > 2/3 of all observed sectors)
+
+If `AutoVal?` is **not present**, all stars in the file will be classified regardless of this flag.
+
+---
+
+#### Required Columns for Classification
+
+If you are not using the full pipeline (`protify run` and `protify summarize`), your `--summary` CSV **must** include the following columns:
+
+| Column    | Description                                                                 |
+|-----------|-----------------------------------------------------------------------------|
+| `prot`    | Final rotation period (in days), usually from multiple sector detections    |
+| `func`    | Fractional uncertainty on the period: `uncertainty / prot`                  |
+| `snr`     | Average signal-to-noise ratio across sectors — defined as `peak power / median power` |
+| `mpower`  | Average of median periodogram power across all sectors                      |
+
+> **Note:** The definitions of `snr` and `mpower` may vary depending on the periodogram method used. For compatibility with the trained model, we recommend generating them using `protify run` followed by `protify summarize`.
+
 
 ---
 
