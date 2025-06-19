@@ -1,13 +1,14 @@
 # Protify
 
+[![DOI](https://zenodo.org/badge/999903920.svg)](https://doi.org/10.5281/zenodo.15701071)
+
 Protify is a Python package for estimating stellar rotation periods from TESS light curves. It combines Lomb-Scargle periodogram analysis, custom light curve metrics, and a trained machine learning classifier to identify likely rotators.
 
 The classifier is trained on benchmark gyrochronology open cluster stars and selected field stars from [Rampalli et al. (2023)](#citation), achieving a cross-validation accuracy of approximately 80%.
 
-> If you use Protify in your work, **please cite [Rampalli et al. (2023)](#citation).**
+> If you use Protify in your work, **please cite both the Zenodo release and [Rampalli et al. (2023)](#citation).**
 
 Original code written by Rayna Rampalli. This package was developed with the help of OpenAI tools to support coding and documentation.
-
 
 ---
 
@@ -180,11 +181,30 @@ It prioritizes `PDCSAP_FLUX`, with fallbacks to `SAP_FLUX` or raw `flux`. Light 
 
 ## Citation
 
-If you use Protify, please cite:
+If you use Protify, please cite the software release **and** the associated paper:
+
+### Software Citation
+
+Rayna Rampalli. (2025). *Protify: A rotation period pipeline for TESS light curves* (v0.1.1) [Software]. Zenodo.  
+[https://doi.org/10.5281/zenodo.15701072](https://doi.org/10.5281/zenodo.15701072)
+
+```bibtex
+@software{protify_v011,
+  author       = {Rampalli, Rayna},
+  title        = {Protify: A rotation period pipeline for TESS light curves},
+  version      = {v0.1.1},
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.15701072},
+  url          = {https://doi.org/10.5281/zenodo.15701072}
+}
+```
+
+### Paper Citation
 
 **Rampalli et al. (2023)**  
 *Wrinkles in Time. I. Rapid Rotators Found in High-eccentricity Orbits*  
-ApJ, 958, 76.  
+ApJ, 958, 76  
 [ADS link](https://ui.adsabs.harvard.edu/abs/2023ApJ...958...76R) | [arXiv:2310.02305](https://arxiv.org/abs/2310.02305)
 
 ```bibtex
@@ -192,7 +212,7 @@ ApJ, 958, 76.
        author = {{Rampalli}, Rayna and {Smock}, Amy and {Newton}, Elisabeth R. and {Daniel}, Kathryne J. and {Curtis}, Jason L.},
         title = "{Wrinkles in Time. I. Rapid Rotators Found in High-eccentricity Orbits}",
       journal = {\apj},
-     keywords = {Stellar rotation, Milky Way dynamics, Stellar kinematics, Stellar ages, 1629, 1051, 1608, 1581, Astrophysics - Solar and Stellar Astrophysics, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Astrophysics of Galaxies},
+     keywords = {Stellar rotation, Milky Way dynamics, Stellar kinematics, Stellar ages, 1629, 1051, 1608, 1581},
          year = 2023,
         month = nov,
        volume = {958},
@@ -202,12 +222,8 @@ ApJ, 958, 76.
           doi = {10.3847/1538-4357/acff69},
 archivePrefix = {arXiv},
        eprint = {2310.02305},
- primaryClass = {astro-ph.SR},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2023ApJ...958...76R},
-      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ primaryClass = {astro-ph.SR}
 }
-
-
 ```
 
 ---
