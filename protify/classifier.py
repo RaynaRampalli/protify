@@ -117,13 +117,21 @@ def generate_summary_from_raw(raw_csv_path, out_csv_path="rotation_summary.csv",
 
             match_counts.append(match_count)
             avals.append(int(match_count >= (2 / 3) * count))
-            fprot = np.nanmax(fprot_init)
-            func = func_init[np.nanargmax(fprot_init)]
+
+            if np.all(np.isnan(fprot_init)):
+                fprot = np.nan
+                func = np.nan
+                print(f"[WARN] All sector matches rejected for TIC {row.get('TIC', j)}")
+            else:
+                fprot = np.nanmax(fprot_init)
+                func = func_init[np.nanargmax(fprot_init)]
+
         elif count == 1:
             fprot = nanprots[0]
             func = nanuncs[0]
             avals.append(0)
             match_counts.append(np.nan)
+
         else:
             fprot = np.median(allprots)
             func = np.median(alluncs)
@@ -139,6 +147,7 @@ def generate_summary_from_raw(raw_csv_path, out_csv_path="rotation_summary.csv",
     cc["Detect"] = counts
     cc["Matches"] = match_counts
     cc["Sectors"] = sector_counts
+    cc["ReliableDetection"] = cc["AutoVal?"] == 1  # ✅ New column
 
     valid_df = cc[cc["AutoVal?"] == 1] if autoval_only else cc.copy()
 
@@ -170,17 +179,12 @@ def generate_summary_from_raw(raw_csv_path, out_csv_path="rotation_summary.csv",
     valid_df["mpower"] = mpowers
     valid_df["func"] = mean_funcs
     valid_df["prot"] = valid_df["FinalProt"]
-    #valid_df["gmag"] = valid_df.get("phot_g_mean_mag", np.nan)
+
     if "gmag" not in valid_df.columns:
         valid_df["gmag"] = valid_df.get("phot_g_mean_mag", np.nan)
 
     summary_cols = ["gmag", "prot", "snr", "power", "mpower", "func"]
     summary_cols = [col for col in summary_cols if col in valid_df.columns]
-
-    # Debug print
-    #print(f"\n[DEBUG] Rows before filtering: {len(valid_df)}")
-    #for col in summary_cols:
-        #print(f"[DEBUG] Missing in {col}: {valid_df[col].isna().sum()}")
 
     out_df = valid_df.dropna(subset=summary_cols)
 
